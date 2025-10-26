@@ -18,10 +18,12 @@ L'erreur `Could not resolve hostname ftp` signifie que le serveur dans votre sec
 │ SSH Access Details                      │
 ├─────────────────────────────────────────┤
 │ Hostname:    srv123.hostinger.com       │  ← COPIEZ CECI
-│ Port:        22                          │
+│ Port:        65002 (ou 22)               │  ← COPIEZ CECI AUSSI !
 │ Username:    u123456789                  │  ← COPIEZ CECI
 │ Password:    [Votre mot de passe]        │
 └─────────────────────────────────────────┘
+
+⚠️ **IMPORTANT** : Hostinger utilise souvent le port **65002** au lieu de 22 !
 ```
 
 ### Méthode 2 : Via la section Fichiers
@@ -41,6 +43,13 @@ OU (si on vous donne une IP)
 ```
 123.45.67.89
 ```
+
+### Secret `SSH_PORT` (NOUVEAU - IMPORTANT !) :
+Si Hostinger affiche le port **65002** dans votre panneau :
+```
+65002
+```
+Sinon, laissez vide (le workflow utilisera 65002 par défaut)
 
 ### ❌ Formats INCORRECTS à éviter :
 - `ftp.votredomaine.com` ❌ (c'est pour FTP classique, pas SFTP)
@@ -75,12 +84,14 @@ Avant de lancer GitHub Actions, testez votre connexion avec FileZilla :
 2. **Configurez une nouvelle connexion** :
    - Protocole : **SFTP - SSH File Transfer Protocol**
    - Hôte : `srv123.hostinger.com` (votre hostname)
-   - Port : `22`
+   - Port : **`65002`** (essayez d'abord 65002, puis 22 si ça ne marche pas)
    - Type d'authentification : **Normal**
    - Identifiant : `u123456789` (votre username)
    - Mot de passe : votre mot de passe
 
 3. **Cliquez sur "Connexion rapide"**
+
+💡 **Astuce** : Si la connexion échoue avec le port 65002, essayez le port 22
 
 Si ça fonctionne avec FileZilla, ça fonctionnera avec GitHub Actions ! ✅
 
@@ -90,10 +101,14 @@ Une fois que vous avez les bonnes informations :
 
 1. Allez sur votre repository GitHub
 2. **Settings** → **Secrets and variables** → **Actions**
-3. Cliquez sur **FTP_SERVER** et modifiez-le avec le bon hostname
-4. Cliquez sur **FTP_USERNAME** et vérifiez qu'il est correct
-5. Cliquez sur **FTP_PASSWORD** et vérifiez qu'il est correct
-6. **Sauvegardez** les modifications
+3. Vérifiez/modifiez ces secrets :
+   - **FTP_SERVER** : Le hostname (ex: `srv123.hostinger.com`)
+   - **FTP_USERNAME** : Votre username SSH (ex: `u123456789`)
+   - **FTP_PASSWORD** : Votre mot de passe SSH
+   - **SSH_PORT** (optionnel) : Si différent de 65002, créez ce secret avec le bon port
+4. **Sauvegardez** les modifications
+
+⚠️ **Note** : Par défaut, le workflow utilise le port **65002**. Créez le secret `SSH_PORT` seulement si votre port est différent.
 
 ## 🚨 Erreurs courantes
 
@@ -103,8 +118,10 @@ Une fois que vous avez les bonnes informations :
 ### "Could not resolve hostname ***"
 → Le hostname dans votre secret est vide ou invalide
 
-### "Connection refused"
-→ Le port est incorrect ou l'accès SSH n'est pas activé
+### "Connection refused" ou "Operation timed out"
+→ Le port est incorrect. Hostinger utilise généralement le port **65002** au lieu de 22
+→ Vérifiez le port dans votre panneau Hostinger SSH Access
+→ L'accès SSH n'est peut-être pas activé dans votre panneau
 
 ### "Authentication failed"
 → Username ou mot de passe incorrect
