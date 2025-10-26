@@ -10,15 +10,25 @@ Ce projet utilise GitHub Actions pour déployer automatiquement sur Hostinger à
 
 ## 🔧 Configuration
 
-### 1. Récupérer vos identifiants FTP Hostinger
+### 1. Récupérer vos identifiants SSH/SFTP Hostinger
 
 Connectez-vous à votre panneau Hostinger (hPanel) :
-1. Allez dans **Fichiers** → **Gestionnaire de fichiers**
-2. Cliquez sur **Accès FTP**
-3. Notez les informations suivantes :
-   - **Serveur FTP** (ex: `ftp.votredomaine.com` ou une IP)
-   - **Nom d'utilisateur FTP** (ex: `u123456789`)
-   - **Mot de passe FTP** (celui que vous avez défini)
+
+#### Option 1 : Via l'interface Hostinger
+1. Allez dans **Hébergement** → Sélectionnez votre site
+2. Cliquez sur **Avancé** dans le menu latéral
+3. Cherchez la section **Accès SSH** ou **Détails SSH/SFTP**
+4. Activez l'accès SSH si ce n'est pas déjà fait
+5. Notez les informations suivantes :
+   - **Serveur SSH/SFTP** (ex: `srv123.hostinger.com` ou une IP comme `123.45.67.89`)
+   - **Port SSH** (généralement `22` ou `65002` pour Hostinger)
+   - **Nom d'utilisateur SSH** (ex: `u123456789`)
+   - **Mot de passe SSH** (le même que votre hébergement ou celui que vous avez défini)
+
+#### Option 2 : Via la page principale
+1. Sur la page d'accueil hPanel
+2. Cliquez sur **Fichiers** → **FTP Accounts** ou **SSH Access**
+3. Récupérez les informations d'accès SSH/SFTP
 
 ### 2. Configurer les Secrets GitHub
 
@@ -30,26 +40,29 @@ Connectez-vous à votre panneau Hostinger (hPanel) :
 
 #### Secret 1 : FTP_SERVER
 - **Name:** `FTP_SERVER`
-- **Value:** Votre serveur FTP (ex: `ftp.votredomaine.com`)
+- **Value:** Votre serveur SSH/SFTP Hostinger (ex: `srv123.hostinger.com` ou `123.45.67.89`)
+- ⚠️ **Important** : N'incluez PAS `sftp://` ou le port, juste le nom d'hôte ou l'IP
 
 #### Secret 2 : FTP_USERNAME
 - **Name:** `FTP_USERNAME`
-- **Value:** Votre nom d'utilisateur FTP (ex: `u123456789`)
+- **Value:** Votre nom d'utilisateur SSH (ex: `u123456789`)
 
 #### Secret 3 : FTP_PASSWORD
 - **Name:** `FTP_PASSWORD`
-- **Value:** Votre mot de passe FTP
+- **Value:** Votre mot de passe SSH/SFTP
 
 ### 3. Vérifier la structure du serveur
 
 Assurez-vous que le dossier cible sur Hostinger est correct :
-- Par défaut, le workflow déploie vers `./public_html/`
-- Si votre dossier web est différent, modifiez la ligne `server-dir` dans `.github/workflows/deploy.yml`
+- Par défaut, le workflow déploie vers `/public_html/`
+- Si votre dossier web est différent, modifiez la ligne `remote_path` dans `.github/workflows/deploy.yml`
 
-Exemples de dossiers possibles :
-- `./public_html/` (par défaut)
-- `./domains/votredomaine.com/public_html/`
-- `./www/`
+Exemples de dossiers possibles sur Hostinger :
+- `/public_html/` (par défaut, le plus courant)
+- `/domains/votredomaine.com/public_html/`
+- `/home/u123456789/public_html/`
+
+💡 **Astuce** : Connectez-vous via un client SFTP (comme FileZilla) pour vérifier le chemin exact
 
 ## 🎯 Utilisation
 
@@ -65,7 +78,7 @@ Une fois configuré, le déploiement est **automatique** :
 3. GitHub Actions va automatiquement :
    - ✅ Installer les dépendances
    - ✅ Builder le projet React
-   - ✅ Déployer sur Hostinger via FTP
+   - ✅ Déployer sur Hostinger via SFTP
 
 ## 📊 Suivi du déploiement
 
@@ -90,7 +103,7 @@ Déclencheur : Push sur main/master
 ↓
 4. Build du projet (npm run build)
 ↓
-5. Upload via FTP vers Hostinger
+5. Upload via SFTP vers Hostinger
 ```
 
 ## ⚠️ Notes Importantes
@@ -98,7 +111,8 @@ Déclencheur : Push sur main/master
 1. **Première fois** : Le premier déploiement peut prendre 5-10 minutes
 2. **Cache** : Les dépendances sont mises en cache pour accélérer les déploiements suivants
 3. **Build** : Seul le dossier `frontend/dist/` (version buildée) est déployé
-4. **Sécurité** : Ne commitez JAMAIS vos identifiants FTP dans le code, utilisez toujours les secrets GitHub
+4. **Sécurité** : Ne commitez JAMAIS vos identifiants SSH/SFTP dans le code, utilisez toujours les secrets GitHub
+5. **SFTP vs FTP** : Hostinger utilise SFTP (protocole sécurisé), pas FTP classique
 
 ## 🛠️ Personnalisation
 
@@ -116,37 +130,46 @@ on:
 
 Modifiez dans `.github/workflows/deploy.yml` :
 ```yaml
-server-dir: ./public_html/  # Changez ici
+remote_path: /public_html/  # Changez ici
 ```
 
 ### Nettoyage avant déploiement
 
 Si vous voulez supprimer tous les anciens fichiers avant chaque déploiement :
 ```yaml
-dangerous-clean-slate: true  # ⚠️ Attention : supprime tout
+delete_remote_files: true  # ⚠️ Attention : supprime les anciens fichiers
 ```
 
 ## 🆘 Dépannage
 
+### Erreur "ENOTFOUND" ou "server doesn't seem to exist"
+- ⚠️ Vérifiez que vous utilisez le bon **hostname SSH** (ex: `srv123.hostinger.com`)
+- N'incluez PAS `sftp://` ni le port (`:22`) dans `FTP_SERVER`
+- Vérifiez que l'accès SSH est activé dans votre panneau Hostinger
+
 ### Erreur "Authentication failed"
-- Vérifiez vos identifiants FTP dans les secrets GitHub
-- Testez la connexion FTP avec un client comme FileZilla
+- Vérifiez vos identifiants SSH/SFTP dans les secrets GitHub
+- Testez la connexion SFTP avec un client comme FileZilla (protocole SFTP, port 22)
+- Assurez-vous que le mot de passe est correct (pas de caractères spéciaux mal échappés)
 
 ### Erreur "Permission denied"
 - Vérifiez que le dossier cible existe sur Hostinger
 - Vérifiez les permissions du dossier (doit être 755)
+- Vérifiez le chemin complet : `/public_html/` ou `/home/uXXXXXXXXX/public_html/`
 
 ### Le site ne se met pas à jour
 - Videz le cache de votre navigateur (Ctrl + F5)
-- Vérifiez que le dossier `server-dir` est correct
+- Vérifiez que le chemin `remote_path` est correct
 - Vérifiez les logs dans l'onglet Actions de GitHub
+- Connectez-vous via SFTP pour vérifier que les fichiers ont bien été uploadés
 
 ## 📞 Support
 
 En cas de problème :
 1. Consultez les logs dans GitHub Actions
-2. Vérifiez votre configuration FTP sur Hostinger
+2. Vérifiez votre configuration SSH/SFTP sur Hostinger
 3. Assurez-vous que tous les secrets sont correctement configurés
+4. Testez la connexion manuellement avec FileZilla (SFTP, port 22)
 
 ---
 

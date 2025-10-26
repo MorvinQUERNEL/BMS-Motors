@@ -29,13 +29,14 @@ jobs:
         working-directory: ./frontend
         run: npm run build
 
-      - name: Deploy to Hostinger via FTP
-        uses: SamKirkland/FTP-Deploy-Action@4.3.3
+      - name: Deploy to Hostinger via SFTP
+        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./frontend/dist/
-          server-dir: ./public_html/
-          dangerous-clean-slate: false
+          local_path: ./frontend/dist/*
+          remote_path: /public_html/
+          sftp_only: true
+          delete_remote_files: false
 
