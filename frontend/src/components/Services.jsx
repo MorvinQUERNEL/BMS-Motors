@@ -11,27 +11,32 @@ const Services = () => {
     {
       title: 'Inspection Complète',
       description: 'Vérification technique approfondie par nos experts avant chaque importation. Garantie qualité.',
-      color: '#4a5568'
+      color: '#4a5568',
+      backgroundImage: '/images/services/inspection_complète2.jpg'
     },
     {
       title: 'Démarches Simplifiées',
       description: 'Nous gérons toute la paperasse : documents, immatriculation, douane, et homologation.',
-      color: '#6b7280'
+      color: '#6b7280',
+      backgroundImage: '/images/services/demarche_simplifie.jpg'
     },
     {
       title: 'Transport Sécurisé',
       description: 'Livraison en camion fermé avec assurance tous risques. Suivi en temps réel de votre véhicule.',
-      color: '#8b9199'
+      color: '#8b9199',
+      backgroundImage: '/images/services/transport_securisé.jpg'
     },
     {
       title: 'Prix Transparents',
       description: 'Aucun frais caché. Devis détaillé incluant tous les coûts d\'importation et de livraison.',
-      color: '#4a5568'
+      color: '#4a5568',
+      backgroundImage: '/images/services/prix_transparant.jpg'
     },
     {
       title: 'Service Rapide',
       description: 'De la recherche à la livraison en 2-3 semaines. Suivi personnalisé tout au long du processus.',
-      color: '#6b7280'
+      color: '#6b7280',
+      backgroundImage: '/images/services/service_rapide.jpg'
     }
   ];
 
