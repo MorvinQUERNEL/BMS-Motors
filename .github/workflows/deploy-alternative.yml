@@ -1,10 +1,7 @@
-name: Deploy to Hostinger
+name: Deploy to Hostinger (Alternative Method)
 
 on:
-  push:
-    branches:
-      - main
-      - master
+  workflow_dispatch:  # Permet de lancer manuellement
 
 jobs:
   deploy:
@@ -29,23 +26,21 @@ jobs:
         working-directory: ./frontend
         run: npm run build
 
-      - name: List files to deploy
+      - name: List built files
         run: |
-          echo "📦 Files that will be deployed:"
-          ls -la ./frontend/dist/
-          echo "📊 Total files:"
-          find ./frontend/dist/ -type f | wc -l
+          echo "📦 Built files:"
+          ls -laR ./frontend/dist/
 
-      - name: Deploy to Hostinger via SFTP
-        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
+      - name: Deploy via SCP
+        uses: appleboy/scp-action@master
         with:
-          server: ${{ secrets.FTP_SERVER }}
-          port: ${{ secrets.SSH_PORT || '65002' }}
+          host: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local_path: ./frontend/dist/
-          remote_path: ./public_html
-          sftp_only: true
-          delete_remote_files: false
-          sftpArgs: '-v'
+          port: ${{ secrets.SSH_PORT || '65002' }}
+          source: "./frontend/dist/*"
+          target: "public_html/"
+          strip_components: 2
+          rm: false
+          debug: true
 
