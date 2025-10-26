@@ -37,15 +37,15 @@ jobs:
           find ./frontend/dist/ -type f | wc -l
 
       - name: Deploy to Hostinger via SFTP
-        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
+        uses: appleboy/scp-action@v0.1.7
         with:
-          server: ${{ secrets.FTP_SERVER }}
-          port: ${{ secrets.SSH_PORT || '65002' }}
+          host: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local_path: ./frontend/dist/
-          remote_path: ./public_html
-          sftp_only: true
-          delete_remote_files: false
-          sftpArgs: '-v'
+          port: ${{ secrets.SSH_PORT || '65002' }}
+          source: "frontend/dist/*,frontend/dist/.*"
+          target: "public_html/"
+          strip_components: 2
+          overwrite: true
+          rm: false
 
