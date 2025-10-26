@@ -36,6 +36,12 @@ jobs:
           echo "📊 Total files:"
           find ./frontend/dist/ -type f | wc -l
 
+      - name: Prepare files for deployment
+        run: |
+          mkdir -p deploy_temp
+          cp -r ./frontend/dist/* deploy_temp/
+          ls -la deploy_temp/
+
       - name: Deploy to Hostinger via SFTP
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -43,9 +49,9 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           port: ${{ secrets.SSH_PORT || '65002' }}
-          source: "frontend/dist/*,frontend/dist/.*"
-          target: "public_html/"
-          strip_components: 2
+          source: "deploy_temp/*"
+          target: "domains/bms-motors.com/public_html/"
+          strip_components: 1
           overwrite: true
           rm: false
 
