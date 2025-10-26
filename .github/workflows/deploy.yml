@@ -36,8 +36,8 @@ jobs:
           port: ${{ secrets.SSH_PORT || '65002' }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local_path: ./frontend/dist/*
-          remote_path: /public_html/
+          local_path: ./frontend/dist/
+          remote_path: /public_html
           sftp_only: true
           delete_remote_files: false
 
